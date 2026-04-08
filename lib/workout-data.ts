@@ -53,7 +53,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 4, reps: "10–12", restSeconds: 90,
         note: "Leve indipendenti, focus sulla parte alta del petto",
-        imageUrl: "https://www.panattasport.com/en/fit-evo/incline-chest-press/",
+        imageUrl: "https://www.panattasport.com/en/sec/inclined-chest-press-3/",
         articleUrl: "https://exrx.net/WeightExercises/PectoralClavicular/LVInclineChestPress",
       },
       {
@@ -69,7 +69,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 3, reps: "12–15", restSeconds: 60,
         note: "Movimento lento e controllato, stira bene in apertura",
-        imageUrl: "https://www.panattasport.com/en/fit-evo/pectoral/",
+        imageUrl: "https://www.panattasport.com/en/sec/pectoral-machine-3/",
         articleUrl: "https://exrx.net/WeightExercises/PectoralSternal/LVPecFly",
       },
       {
@@ -120,7 +120,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Diamond – Andrea Presti",
         sets: 4, reps: "10–12", restSeconds: 90,
         note: "Chest supported row con maniglie regolabili: massima attivazione dorsale",
-        imageUrl: "https://www.instagram.com/diamond_andrea_presti/",
+        imageUrl: "https://www.diamondfitnesspro.com/en/products/dap-chopper-row/",
         articleUrl: "https://exrx.net/WeightExercises/BackGeneral/LVChestSupportedRow",
       },
       {
@@ -144,7 +144,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 4, reps: "12", restSeconds: 60,
         note: "Seduta regolabile gas-assistita, poggiabraccia ampio",
-        imageUrl: "https://www.panattasport.com/en/fit-evo/biceps-curl/",
+        imageUrl: "https://www.panattasport.com/en/sec/curling-machine-4",
         articleUrl: "https://exrx.net/WeightExercises/Biceps/LVBicepsCurl",
       },
       {
@@ -194,7 +194,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 3, reps: "10–12", restSeconds: 120,
         note: "Ottima alternativa allo squat libero per rientro",
-        imageUrl: "https://www.panattasport.com/en/freeweight-special/hack-squat/",
+        imageUrl: "https://www.panattasport.com/en/free-weight-special/super-hack-squat/",
         articleUrl: "https://exrx.net/WeightExercises/Quadriceps/LVHackSquat",
       },
       {
@@ -202,7 +202,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 3, reps: "15", restSeconds: 60,
         note: "Chiudi lentamente, resistenza anche in apertura",
-        imageUrl: "https://www.panattasport.com/en/fit-evo/hip-adductor/",
+        imageUrl: "https://www.panattasport.com/en/sec/adductor-machine-3/",
         articleUrl: "https://exrx.net/WeightExercises/HipAdductors/LVHipAdduction",
       },
       {
@@ -236,7 +236,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 4, reps: "15", restSeconds: 60,
         note: "Gomiti leggermente piegati, alza fino all'altezza delle spalle",
-        imageUrl: "https://www.panattasport.com/en/fit-evo/lateral-raise/",
+        imageUrl: "https://www.panattasport.com/en/fit-evo/lateral-deltoids/",
         articleUrl: "https://exrx.net/WeightExercises/DeltoidLateral/LVLateralRaise",
       },
       {
@@ -244,7 +244,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 4, reps: "15", restSeconds: 60,
         note: "Fondamentale per equilibrio e postura",
-        imageUrl: "https://www.panattasport.com/en/fit-evo/rear-deltoid/",
+        imageUrl: "https://www.panattasport.com/en/free-weight-special/back-deltoids/",
         articleUrl: "https://exrx.net/WeightExercises/DeltoidPosterior/LVRearDeltFly",
       },
       {
@@ -288,7 +288,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 3, reps: "12", restSeconds: 90,
         note: "Volume aggiuntivo sul petto",
-        imageUrl: "https://www.panattasport.com/en/sec/chest-press/",
+        imageUrl: "https://www.panattasport.com/en/freeweight-hp/horizontal-bench-press/",
         articleUrl: "https://exrx.net/WeightExercises/PectoralSternal/LVChestPressS",
       },
       {
@@ -296,7 +296,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Panatta",
         sets: 3, reps: "15", restSeconds: 60,
         note: "Focus sulla contrazione finale",
-        imageUrl: "https://www.panattasport.com/en/fit-evo/pectoral/",
+        imageUrl: "https://www.panattasport.com/en/sec/pectoral-machine-3/",
         articleUrl: "https://exrx.net/WeightExercises/PectoralSternal/LVPecFly",
       },
       {
@@ -312,7 +312,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Diamond – Andrea Presti",
         sets: 3, reps: "15", restSeconds: 60,
         note: "Peso più leggero, focus sulla qualità",
-        imageUrl: "https://www.instagram.com/diamond_andrea_presti/",
+        imageUrl: "https://www.diamondfitnesspro.com/en/products/dap-chopper-row/",
         articleUrl: "https://exrx.net/WeightExercises/BackGeneral/LVChestSupportedRow",
       },
       {
