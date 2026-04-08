@@ -120,7 +120,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Diamond – Andrea Presti",
         sets: 4, reps: "10–12", restSeconds: 90,
         note: "Chest supported row con maniglie regolabili: massima attivazione dorsale",
-        imageUrl: "https://www.diamondfitnesspro.com/en/products/dap-chopper-row/",
+        imageUrl: "https://www.instagram.com/prestidiamond/reel/DVg7PG0DGJO/",
         articleUrl: "https://exrx.net/WeightExercises/BackGeneral/LVChestSupportedRow",
       },
       {
@@ -312,7 +312,7 @@ export const workoutData: WorkoutDay[] = [
         machine: "Diamond – Andrea Presti",
         sets: 3, reps: "15", restSeconds: 60,
         note: "Peso più leggero, focus sulla qualità",
-        imageUrl: "https://www.diamondfitnesspro.com/en/products/dap-chopper-row/",
+        imageUrl: "https://www.instagram.com/prestidiamond/reel/DVg7PG0DGJO/",
         articleUrl: "https://exrx.net/WeightExercises/BackGeneral/LVChestSupportedRow",
       },
       {
