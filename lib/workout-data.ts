@@ -9,6 +9,11 @@ export interface Exercise {
   articleUrl: string;
 }
 
+export interface WarmupExercise {
+  name: string;
+  reps: string;
+}
+
 export interface WorkoutDay {
   id: number;
   day: string;
@@ -18,6 +23,7 @@ export interface WorkoutDay {
   color: string;
   badge?: string;
   optional?: boolean;
+  warmup: WarmupExercise[];
   exercises: Exercise[];
 }
 
@@ -47,6 +53,12 @@ export const workoutData: WorkoutDay[] = [
     label: "GIORNO 1",
     muscles: "PETTO + TRICIPITI",
     color: "#E8474C",
+    warmup: [
+      { name: "Cerchi con le braccia avanti/indietro", reps: "20 per direzione" },
+      { name: "Band pull-apart (elastico)", reps: "15 reps" },
+      { name: "Push-up leggeri a terra", reps: "10 reps" },
+      { name: "Rotazioni spalle con elastico", reps: "15 reps" },
+    ],
     exercises: [
       {
         name: "Chest Press Inclinata",
@@ -106,6 +118,12 @@ export const workoutData: WorkoutDay[] = [
     muscles: "SCHIENA + BICIPITI",
     color: "#00C2FF",
     badge: "OGGI",
+    warmup: [
+      { name: "Band pull-apart", reps: "15 reps" },
+      { name: "Scapular pull-up (retrazione scapole alla sbarra)", reps: "10 reps" },
+      { name: "Rotazioni busto in piedi", reps: "15 per lato" },
+      { name: "Cerchi con le braccia", reps: "15 per direzione" },
+    ],
     exercises: [
       {
         name: "Lat Machine Presa Larga",
@@ -164,6 +182,12 @@ export const workoutData: WorkoutDay[] = [
     label: "GIORNO 3",
     muscles: "GAMBE + POLPACCI",
     color: "#00E676",
+    warmup: [
+      { name: "Squat a corpo libero", reps: "15 reps" },
+      { name: "Affondi alternati a corpo libero", reps: "10 per gamba" },
+      { name: "Cerchi con le anche", reps: "10 per lato" },
+      { name: "Mobilità caviglie (ginocchio al muro)", reps: "10 per lato" },
+    ],
     exercises: [
       {
         name: "Leg Press Orizzontale",
@@ -222,6 +246,12 @@ export const workoutData: WorkoutDay[] = [
     label: "GIORNO 4",
     muscles: "SPALLE + CORE",
     color: "#FF9800",
+    warmup: [
+      { name: "Cerchi con le braccia", reps: "20 per direzione" },
+      { name: "Rotazioni spalle con elastico (pass-through)", reps: "15 reps" },
+      { name: "Band pull-apart", reps: "15 reps" },
+      { name: "Alzate laterali a corpo libero (senza peso)", reps: "15 reps" },
+    ],
     exercises: [
       {
         name: "Shoulder Press Machine",
@@ -282,6 +312,12 @@ export const workoutData: WorkoutDay[] = [
     color: "#B388FF",
     badge: "OPZ.",
     optional: true,
+    warmup: [
+      { name: "Cerchi braccia + rotazioni spalle", reps: "15 per direzione" },
+      { name: "Push-up leggeri", reps: "10 reps" },
+      { name: "Band pull-apart", reps: "15 reps" },
+      { name: "Rotazioni busto", reps: "10 per lato" },
+    ],
     exercises: [
       {
         name: "Chest Press Orizzontale",

@@ -176,6 +176,40 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
         </div>
       </button>
 
+      {/* Warm-up block */}
+      {day.warmup.length > 0 && (
+        <div
+          className={cn(
+            "overflow-hidden transition-all duration-300 ease-in-out",
+            open ? "max-h-[9999px] opacity-100" : "max-h-0 opacity-0"
+          )}
+        >
+          <div className="mx-3 mt-3 rounded-lg border border-dashed border-orange-500/30 bg-orange-500/5">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-dashed border-orange-500/20">
+              <span className="text-base leading-none">🔥</span>
+              <span className="text-[10px] font-bold tracking-widest uppercase text-orange-400/80">
+                Riscaldamento · ~5 min
+              </span>
+            </div>
+            <ul className="px-3 py-2 space-y-1.5">
+              {day.warmup.map((w, i) => (
+                <li key={i} className="flex items-baseline justify-between gap-2">
+                  <span className="text-xs text-muted-foreground leading-snug">{w.name}</span>
+                  <span className="flex-shrink-0 text-[10px] font-mono font-semibold text-orange-400/70 whitespace-nowrap">
+                    {w.reps}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mx-3 mt-2 mb-1 flex items-center gap-2">
+            <div className="flex-1 h-px bg-border/40" />
+            <span className="text-[9px] font-bold tracking-widest uppercase text-muted-foreground/40">Esercizi principali</span>
+            <div className="flex-1 h-px bg-border/40" />
+          </div>
+        </div>
+      )}
+
       {/* Exercise list */}
       <div
         className={cn(
