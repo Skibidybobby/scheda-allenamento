@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ChevronDown, RotateCcw, CheckCircle2 } from "lucide-react";
+import { ChevronDown, RotateCcw, CheckCircle2, BookOpen, ImageIcon, Timer } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import {
   type Equipment,
   equipmentColors,
 } from "@/lib/workout-data";
+import { useTimer } from "./TimerContext";
 
 interface WorkoutDayProps {
   day: WorkoutDayType;
@@ -29,14 +30,41 @@ function EquipmentBadge({ eq }: { eq: Equipment }) {
   );
 }
 
+function IconLink({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      onClick={(e) => e.stopPropagation()}
+      className={cn(
+        "inline-flex items-center justify-center w-6 h-6 rounded-md",
+        "text-muted-foreground/60 hover:text-primary hover:bg-primary/10",
+        "transition-all duration-150 active:scale-90 flex-shrink-0"
+      )}
+    >
+      {children}
+    </a>
+  );
+}
+
 export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps) {
   const storageKey = `scheda-day-${day.id}`;
   const [open, setOpen] = useState(defaultOpen);
-  // Initialize with empty array to avoid hydration mismatch; load from localStorage in effect
   const [checked, setChecked] = useState<boolean[]>(() =>
     new Array(day.exercises.length).fill(false)
   );
   const [mounted, setMounted] = useState(false);
+  const { startTimer } = useTimer();
 
   useEffect(() => {
     setMounted(true);
@@ -49,7 +77,7 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
         }
       }
     } catch {
-      // ignore parse errors
+      // ignore
     }
   }, [storageKey, day.exercises.length]);
 
@@ -60,12 +88,17 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
         try {
           localStorage.setItem(storageKey, JSON.stringify(next));
         } catch {
-          // ignore storage errors
+          // ignore
+        }
+        // Auto-start rest timer when checking off (not unchecking)
+        if (!prev[index]) {
+          const ex = day.exercises[index];
+          startTimer(ex.name, ex.restSeconds);
         }
         return next;
       });
     },
-    [storageKey]
+    [storageKey, day.exercises, startTimer]
   );
 
   const resetDay = useCallback(() => {
@@ -91,7 +124,7 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
         allDone && mounted && "border-primary/40"
       )}
     >
-      {/* Day header — clickable to expand/collapse */}
+      {/* Day header */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-t-xl"
@@ -143,13 +176,10 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
             </div>
 
             <div className="flex items-center gap-3 flex-shrink-0 pt-0.5">
-              {/* Progress count */}
               <div className="text-right">
                 <div className="text-lg font-bold text-foreground leading-none">
                   {mounted ? completedCount : 0}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    /{totalCount}
-                  </span>
+                  <span className="text-sm font-normal text-muted-foreground">/{totalCount}</span>
                 </div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">esercizi</div>
               </div>
@@ -165,7 +195,7 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
         </div>
       </button>
 
-      {/* Expandable exercise list */}
+      {/* Exercise list */}
       <div
         className={cn(
           "overflow-hidden transition-all duration-300 ease-in-out",
@@ -176,15 +206,15 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
           {day.exercises.map((exercise, idx) => {
             const isChecked = mounted ? checked[idx] : false;
             return (
-              <label
+              <div
                 key={idx}
-                htmlFor={`ex-${day.id}-${idx}`}
                 className={cn(
-                  "flex items-start gap-3 px-4 sm:px-5 py-3.5 cursor-pointer",
-                  "transition-all duration-150 hover:bg-accent/40 group",
-                  isChecked && "exercise-row-checked"
+                  "flex items-start gap-3 px-4 sm:px-5 py-3.5",
+                  "transition-all duration-150 hover:bg-accent/30 group",
+                  isChecked && "opacity-50"
                 )}
               >
+                {/* Checkbox */}
                 <Checkbox
                   id={`ex-${day.id}-${idx}`}
                   checked={isChecked}
@@ -193,41 +223,74 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
                 />
 
                 <div className="flex-1 min-w-0">
+                  {/* Top row: name + sets×reps */}
                   <div className="flex items-start justify-between gap-2">
-                    <span
+                    <label
+                      htmlFor={`ex-${day.id}-${idx}`}
                       className={cn(
-                        "exercise-name text-sm font-medium text-foreground leading-snug transition-all",
+                        "text-sm font-medium text-foreground leading-snug cursor-pointer transition-all",
                         isChecked && "line-through text-muted-foreground"
                       )}
                     >
                       {exercise.name}
-                    </span>
-
-                    {/* Sets × reps */}
+                    </label>
                     <span className="flex-shrink-0 text-xs font-mono font-semibold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-md whitespace-nowrap">
                       {exercise.sets}×{exercise.reps}
                     </span>
                   </div>
 
-                  {/* Equipment tags */}
-                  {exercise.equipment && exercise.equipment.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1.5">
-                      {exercise.equipment.map((eq) => (
-                        <EquipmentBadge key={eq} eq={eq} />
-                      ))}
+                  {/* Bottom row: equipment + rest time + action icons */}
+                  <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1.5">
+                    {exercise.equipment?.map((eq) => (
+                      <EquipmentBadge key={eq} eq={eq} />
+                    ))}
+
+                    {/* Rest time indicator */}
+                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
+                      <Timer className="w-3 h-3" />
+                      {exercise.restSeconds}s
+                    </span>
+
+                    {/* Spacer */}
+                    <span className="flex-1" />
+
+                    {/* Action icons: image link, tutorial link, start timer */}
+                    <div className="flex items-center gap-1">
+                      <IconLink href={exercise.imageUrl} label={`Foto: ${exercise.name}`}>
+                        <ImageIcon className="w-3.5 h-3.5" />
+                      </IconLink>
+                      <IconLink href={exercise.articleUrl} label={`Tutorial: ${exercise.name}`}>
+                        <BookOpen className="w-3.5 h-3.5" />
+                      </IconLink>
+                      <button
+                        onClick={() => startTimer(exercise.name, exercise.restSeconds)}
+                        aria-label={`Avvia recupero ${exercise.restSeconds}s`}
+                        className={cn(
+                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-md",
+                          "text-[10px] font-medium border",
+                          "text-primary/70 border-primary/20 bg-primary/5",
+                          "hover:text-primary hover:bg-primary/15 hover:border-primary/40",
+                          "transition-all duration-150 active:scale-95 flex-shrink-0"
+                        )}
+                      >
+                        <Timer className="w-3 h-3" />
+                        Start
+                      </button>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </label>
+              </div>
             );
           })}
         </div>
 
-        {/* Footer with reset */}
+        {/* Footer */}
         {mounted && completedCount > 0 && (
           <div className="px-4 sm:px-5 py-3 border-t border-border/40 bg-muted/20 flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
-              {allDone ? "Allenamento completato!" : `${completedCount} di ${totalCount} completati`}
+              {allDone
+                ? "Allenamento completato!"
+                : `${completedCount} di ${totalCount} completati`}
             </span>
             <button
               onClick={resetDay}
