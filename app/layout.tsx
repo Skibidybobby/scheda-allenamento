@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import NavBar from "@/components/NavBar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Scheda Massa | Green Theory Gym",
-  description: "Piano di allenamento massa muscolare - 5 giorni - Green Theory Gym",
+  title: "Green Theory Gym",
+  description: "Scheda massa & menù settimanale — Green Theory Gym",
 };
 
 export default function RootLayout({
@@ -27,7 +28,10 @@ export default function RootLayout({
       lang="it"
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <NavBar />
+        {children}
+      </body>
     </html>
   );
 }
