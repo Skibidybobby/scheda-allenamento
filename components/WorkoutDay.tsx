@@ -5,11 +5,7 @@ import { ChevronDown, RotateCcw, CheckCircle2, BookOpen, ImageIcon, Timer } from
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import {
-  type WorkoutDay as WorkoutDayType,
-  type Equipment,
-  equipmentColors,
-} from "@/lib/workout-data";
+import { type WorkoutDay as WorkoutDayType, machineColors } from "@/lib/workout-data";
 import { useTimer } from "./TimerContext";
 
 interface WorkoutDayProps {
@@ -17,28 +13,16 @@ interface WorkoutDayProps {
   defaultOpen?: boolean;
 }
 
-function EquipmentBadge({ eq }: { eq: Equipment }) {
+function MachineBadge({ machine }: { machine: string }) {
+  const cls = machineColors[machine] ?? "bg-muted/50 text-muted-foreground border-border/50";
   return (
-    <span
-      className={cn(
-        "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border",
-        equipmentColors[eq]
-      )}
-    >
-      {eq}
+    <span className={cn("inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border", cls)}>
+      {machine}
     </span>
   );
 }
 
-function IconLink({
-  href,
-  label,
-  children,
-}: {
-  href: string;
-  label: string;
-  children: React.ReactNode;
-}) {
+function IconLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
@@ -47,9 +31,9 @@ function IconLink({
       aria-label={label}
       onClick={(e) => e.stopPropagation()}
       className={cn(
-        "inline-flex items-center justify-center w-6 h-6 rounded-md",
+        "inline-flex items-center justify-center w-6 h-6 rounded-md flex-shrink-0",
         "text-muted-foreground/60 hover:text-primary hover:bg-primary/10",
-        "transition-all duration-150 active:scale-90 flex-shrink-0"
+        "transition-all duration-150 active:scale-90"
       )}
     >
       {children}
@@ -57,12 +41,14 @@ function IconLink({
   );
 }
 
+function formatRest(s: number) {
+  return s >= 60 ? `${Math.floor(s / 60)}min${s % 60 ? ` ${s % 60}s` : ""}` : `${s}s`;
+}
+
 export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps) {
   const storageKey = `scheda-day-${day.id}`;
   const [open, setOpen] = useState(defaultOpen);
-  const [checked, setChecked] = useState<boolean[]>(() =>
-    new Array(day.exercises.length).fill(false)
-  );
+  const [checked, setChecked] = useState<boolean[]>(() => new Array(day.exercises.length).fill(false));
   const [mounted, setMounted] = useState(false);
   const { startTimer } = useTimer();
 
@@ -76,105 +62,104 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
           setChecked(parsed);
         }
       }
-    } catch {
-      // ignore
-    }
+    } catch { /* ignore */ }
   }, [storageKey, day.exercises.length]);
 
-  const toggleExercise = useCallback(
-    (index: number) => {
-      setChecked((prev) => {
-        const next = prev.map((v, i) => (i === index ? !v : v));
-        try {
-          localStorage.setItem(storageKey, JSON.stringify(next));
-        } catch {
-          // ignore
-        }
-        // Auto-start rest timer when checking off (not unchecking)
-        if (!prev[index]) {
-          const ex = day.exercises[index];
-          startTimer(ex.name, ex.restSeconds);
-        }
-        return next;
-      });
-    },
-    [storageKey, day.exercises, startTimer]
-  );
+  const toggleExercise = useCallback((index: number) => {
+    setChecked((prev) => {
+      const next = prev.map((v, i) => (i === index ? !v : v));
+      try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch { /* ignore */ }
+      if (!prev[index]) {
+        startTimer(day.exercises[index].name, day.exercises[index].restSeconds);
+      }
+      return next;
+    });
+  }, [storageKey, day.exercises, startTimer]);
 
   const resetDay = useCallback(() => {
-    const reset = new Array(day.exercises.length).fill(false);
-    setChecked(reset);
-    try {
-      localStorage.removeItem(storageKey);
-    } catch {
-      // ignore
-    }
+    setChecked(new Array(day.exercises.length).fill(false));
+    try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
   }, [storageKey, day.exercises.length]);
 
   const completedCount = checked.filter(Boolean).length;
   const totalCount = day.exercises.length;
-  const progressPct = (completedCount / totalCount) * 100;
   const allDone = completedCount === totalCount;
+  const progressPct = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+  // Derive a subtle RGBA gradient from the day's hex color
+  const headerBg = `linear-gradient(135deg, ${day.color}2e 0%, ${day.color}0d 100%)`;
+  const accentBar = day.color;
 
   return (
     <div
       className={cn(
-        "rounded-xl border border-border/60 overflow-hidden transition-all duration-200",
-        "bg-card hover:border-border/90",
-        allDone && mounted && "border-primary/40"
+        "rounded-xl border overflow-hidden transition-all duration-200 bg-card",
+        allDone && mounted ? "border-opacity-60" : "border-border/60 hover:border-border/90"
       )}
+      style={allDone && mounted ? { borderColor: `${day.color}66` } : undefined}
     >
-      {/* Day header */}
+      {/* Header button */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-t-xl"
         aria-expanded={open}
       >
-        <div className={cn("relative p-4 sm:p-5 bg-gradient-to-br", day.color)}>
-          {/* Progress bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-border/30">
+        <div className="relative p-4 sm:p-5" style={{ background: headerBg }}>
+          {/* Left accent bar */}
+          <div
+            className="absolute left-0 top-3 bottom-3 w-0.5 rounded-full"
+            style={{ backgroundColor: day.color }}
+          />
+
+          {/* Progress bar at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-border/20">
             <div
-              className={cn(
-                "h-full transition-all duration-500 ease-out",
-                allDone && mounted ? "bg-primary" : "bg-primary/60"
-              )}
-              style={{ width: mounted ? `${progressPct}%` : "0%" }}
+              className="h-full transition-all duration-500 ease-out"
+              style={{
+                width: mounted ? `${progressPct}%` : "0%",
+                backgroundColor: accentBar,
+                opacity: 0.7,
+              }}
             />
           </div>
 
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-3 pl-3">
             <div className="flex-1 min-w-0">
+              {/* Top labels row */}
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="text-xs font-semibold tracking-widest uppercase text-primary/80">
-                  {day.day}
+                <span
+                  className="text-xs font-bold tracking-widest uppercase"
+                  style={{ color: day.color }}
+                >
+                  {day.label}
                 </span>
-                {day.optional && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/50 font-medium tracking-wide">
-                    Opzionale
+                <span className="text-xs font-semibold text-muted-foreground/60 tracking-wider">
+                  · {day.day} · {day.fullDay}
+                </span>
+                {day.badge && (
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 rounded font-bold tracking-wider"
+                    style={{
+                      backgroundColor: `${day.color}22`,
+                      color: day.color,
+                      border: `1px solid ${day.color}44`,
+                    }}
+                  >
+                    {day.badge}
                   </span>
                 )}
                 {allDone && mounted && (
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: day.color }} />
                 )}
               </div>
 
-              <h2 className="text-lg sm:text-xl font-bold text-foreground leading-tight">
-                {day.title}
+              {/* Muscle group title */}
+              <h2 className="text-lg sm:text-xl font-extrabold text-foreground leading-tight tracking-tight">
+                {day.muscles}
               </h2>
-
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {day.muscles.map((m) => (
-                  <Badge
-                    key={m}
-                    variant="secondary"
-                    className="text-[11px] px-2 py-0.5 bg-secondary/80 font-medium"
-                  >
-                    {m}
-                  </Badge>
-                ))}
-              </div>
             </div>
 
+            {/* Progress count + chevron */}
             <div className="flex items-center gap-3 flex-shrink-0 pt-0.5">
               <div className="text-right">
                 <div className="text-lg font-bold text-foreground leading-none">
@@ -183,12 +168,8 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
                 </div>
                 <div className="text-[10px] text-muted-foreground mt-0.5">esercizi</div>
               </div>
-
               <ChevronDown
-                className={cn(
-                  "w-5 h-5 text-muted-foreground transition-transform duration-200",
-                  open && "rotate-180"
-                )}
+                className={cn("w-5 h-5 text-muted-foreground transition-transform duration-200", open && "rotate-180")}
               />
             </div>
           </div>
@@ -209,52 +190,61 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
               <div
                 key={idx}
                 className={cn(
-                  "flex items-start gap-3 px-4 sm:px-5 py-3.5",
-                  "transition-all duration-150 hover:bg-accent/30 group",
+                  "flex items-start gap-3 px-4 sm:px-5 py-3.5 transition-all duration-150 hover:bg-accent/30",
                   isChecked && "opacity-50"
                 )}
               >
-                {/* Checkbox */}
                 <Checkbox
                   id={`ex-${day.id}-${idx}`}
                   checked={isChecked}
                   onCheckedChange={() => toggleExercise(idx)}
-                  className="mt-0.5 flex-shrink-0 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  className="mt-0.5 flex-shrink-0"
+                  style={isChecked ? { backgroundColor: day.color, borderColor: day.color } : { borderColor: `${day.color}66` }}
                 />
 
                 <div className="flex-1 min-w-0">
-                  {/* Top row: name + sets×reps */}
+                  {/* Exercise name + sets×reps */}
                   <div className="flex items-start justify-between gap-2">
                     <label
                       htmlFor={`ex-${day.id}-${idx}`}
                       className={cn(
-                        "text-sm font-medium text-foreground leading-snug cursor-pointer transition-all",
+                        "text-sm font-semibold text-foreground leading-snug cursor-pointer transition-all",
                         isChecked && "line-through text-muted-foreground"
                       )}
                     >
                       {exercise.name}
                     </label>
-                    <span className="flex-shrink-0 text-xs font-mono font-semibold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-md whitespace-nowrap">
+                    <span
+                      className="flex-shrink-0 text-xs font-mono font-bold px-2 py-0.5 rounded-md whitespace-nowrap border"
+                      style={{
+                        backgroundColor: `${day.color}15`,
+                        color: day.color,
+                        borderColor: `${day.color}30`,
+                      }}
+                    >
                       {exercise.sets}×{exercise.reps}
                     </span>
                   </div>
 
-                  {/* Bottom row: equipment + rest time + action icons */}
-                  <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1.5">
-                    {exercise.equipment?.map((eq) => (
-                      <EquipmentBadge key={eq} eq={eq} />
-                    ))}
+                  {/* Note */}
+                  {exercise.note && (
+                    <p className="text-[11px] text-muted-foreground/70 mt-1 leading-relaxed italic">
+                      {exercise.note}
+                    </p>
+                  )}
 
-                    {/* Rest time indicator */}
-                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
+                  {/* Bottom row: machine badge, rest, icons */}
+                  <div className="flex items-center flex-wrap gap-x-2 gap-y-1.5 mt-2">
+                    <MachineBadge machine={exercise.machine} />
+
+                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground/60">
                       <Timer className="w-3 h-3" />
-                      {exercise.restSeconds}s
+                      {formatRest(exercise.restSeconds)}
                     </span>
 
-                    {/* Spacer */}
                     <span className="flex-1" />
 
-                    {/* Action icons: image link, tutorial link, start timer */}
+                    {/* Action icons */}
                     <div className="flex items-center gap-1">
                       <IconLink href={exercise.imageUrl} label={`Foto: ${exercise.name}`}>
                         <ImageIcon className="w-3.5 h-3.5" />
@@ -266,12 +256,16 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
                         onClick={() => startTimer(exercise.name, exercise.restSeconds)}
                         aria-label={`Avvia recupero ${exercise.restSeconds}s`}
                         className={cn(
-                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-md",
-                          "text-[10px] font-medium border",
-                          "text-primary/70 border-primary/20 bg-primary/5",
-                          "hover:text-primary hover:bg-primary/15 hover:border-primary/40",
-                          "transition-all duration-150 active:scale-95 flex-shrink-0"
+                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-md border",
+                          "text-[10px] font-semibold transition-all duration-150 active:scale-95 flex-shrink-0"
                         )}
+                        style={{
+                          color: day.color,
+                          borderColor: `${day.color}30`,
+                          backgroundColor: `${day.color}0d`,
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${day.color}22`; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${day.color}0d`; }}
                       >
                         <Timer className="w-3 h-3" />
                         Start
@@ -287,10 +281,8 @@ export default function WorkoutDay({ day, defaultOpen = false }: WorkoutDayProps
         {/* Footer */}
         {mounted && completedCount > 0 && (
           <div className="px-4 sm:px-5 py-3 border-t border-border/40 bg-muted/20 flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">
-              {allDone
-                ? "Allenamento completato!"
-                : `${completedCount} di ${totalCount} completati`}
+            <span className="text-xs" style={{ color: allDone ? day.color : undefined }}>
+              {allDone ? "✓ Allenamento completato!" : `${completedCount} di ${totalCount} completati`}
             </span>
             <button
               onClick={resetDay}
